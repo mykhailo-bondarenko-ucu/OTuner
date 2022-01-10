@@ -9,7 +9,7 @@
 #include <ssd1306.h>
 #include <supmath.h>
 
-#define TICK_FREQ_D 72000000.
+#define TICK_FREQ_D 64000000.
 #define LIGHT_FRACTION_DIVISOR 10
 
 typedef enum {
