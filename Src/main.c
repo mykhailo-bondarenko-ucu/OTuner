@@ -114,13 +114,15 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   if (GPIO_Pin == ENC_BTN_Pin) {
     static uint32_t enc_btn_last_it_tick;
     if (HAL_GetTick() - enc_btn_last_it_tick < 50) return;
+
+    if (encoder.btn_is_pressed && (
+      HAL_GetTick() - enc_btn_last_it_tick > 320
+    )) encoder.btn_was_pressed_long = 1;
+
     enc_btn_last_it_tick = HAL_GetTick();
 
     encoder.btn_is_pressed = !encoder.btn_is_pressed;
-    if (encoder.btn_is_pressed) encoder.btn_was_pressed = 1;
-    if (!encoder.btn_is_pressed && (
-      HAL_GetTick() - enc_btn_last_it_tick > 1000
-    )) encoder.btn_was_pressed_long = 1;
+    if (!encoder.btn_is_pressed) encoder.btn_was_pressed = 1;
   }
 
   if (GPIO_Pin == ENC_CLK_Pin) {
@@ -202,14 +204,15 @@ int main(void)
       interface_register_encoder_position(encoder.position);
     }
 
+    if (encoder.btn_was_pressed_long) {
+      encoder.btn_was_pressed_long = 0;
+      encoder.btn_was_pressed = 0;
+      interface_register_long_press();
+    }
+
     if (encoder.btn_was_pressed) {
       encoder.btn_was_pressed = 0;
       interface_register_single_press();
-    }
-
-    if (encoder.btn_was_pressed_long) {
-      encoder.btn_was_pressed_long = 0;
-      interface_register_long_press();
     }
 
     // TODO: diode interface

@@ -70,7 +70,7 @@ INTERFACE_RESPONSE interface_update() {
     } else if (INTERFACE.interface_mode == BRIGHTNESS_SELECTION) {
         ssd1306_Fill(Black);
         ssd1306_SetCursor(0, 16);
-        sprintf(buff, "Brightness divisor: %d", INTERFACE.brightness_divisor);
+        sprintf(buff, "Brightness: 1/%d", INTERFACE.brightness_divisor);
         ssd1306_WriteString(buff, Font_7x10, White);
     } else {
         // TODO: other interface mode
@@ -97,6 +97,9 @@ INTERFACE_RESPONSE interface_register_single_press() {
         interface_set_pitch_selection_current_string_id(
             (INTERFACE.pitch_selection_current_string_id + 1) % STRINGS_NUM
         );
+    } else if (INTERFACE.interface_mode == BRIGHTNESS_SELECTION) {
+        // do nothing
+        return INTERFACE_OK;
     } else {
         INTERFACE.presets_selection_current_tuning_id += 1;
         INTERFACE.presets_selection_current_tuning_id %= TUNINGS_NUM;
