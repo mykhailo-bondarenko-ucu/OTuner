@@ -13,7 +13,7 @@ INTERFACE_PUBLIC_t INTERFACE_P;
 void interface_setupDiodeTickDelays(Tuning tuning) {
   for (size_t i = 0; i < STRINGS_NUM; i ++) {
     uint32_t total_ticks = (uint32_t) (TICK_FREQ_D / NOTES[tuning.note_ids[i]].freq);
-    INTERFACE_P.diode_delay_ticks[i].light_ticks = total_ticks / LIGHT_FRACTION_DIVISOR;
+    INTERFACE_P.diode_delay_ticks[i].light_ticks = total_ticks / INTERFACE.brightness_divisor;
     INTERFACE_P.diode_delay_ticks[i].pause_ticks = total_ticks - INTERFACE_P.diode_delay_ticks[i].light_ticks;
   }
 }
@@ -33,12 +33,14 @@ INTERFACE_RESPONSE interface_init(I2C_HandleTypeDef *hi2c) {
     ssd1306_Init(hi2c);
     INTERFACE.hi2c = hi2c;
     INTERFACE.previous_encoder_position = 0;
+    INTERFACE.brightness_divisor = BRIGHTNESS_FRACTION_INITIAL_DIVISOR;
     // TODO: initialise from saved copy
     INTERFACE.interface_mode = PITCH_SELECTION;
     interface_set_pitch_selection_current_string_id(0);
     INTERFACE.pitch_selection_current_string_id = 0;
     INTERFACE.pitch_selection_current_tuning = tuning_copy(TUNINGS[0]);
     INTERFACE.presets_selection_current_tuning_id = 0;
+    interface_setupDiodeTickDelays(INTERFACE.pitch_selection_current_tuning);
     return interface_update();
 }
 
@@ -64,6 +66,11 @@ INTERFACE_RESPONSE interface_update() {
         // ssd1306_DrawSquare(36, 12, White);
         ssd1306_SetCursor(0, 46);
         sprintf(buff, "F: %d.%d Hz", ((int) note.freq), ((int) (note.freq * 100.f)) % 100);
+        ssd1306_WriteString(buff, Font_7x10, White);
+    } else if (INTERFACE.interface_mode == BRIGHTNESS_SELECTION) {
+        ssd1306_Fill(Black);
+        ssd1306_SetCursor(0, 16);
+        sprintf(buff, "Brightness divisor: %d", INTERFACE.brightness_divisor);
         ssd1306_WriteString(buff, Font_7x10, White);
     } else {
         // TODO: other interface mode
@@ -107,6 +114,17 @@ INTERFACE_RESPONSE interface_register_encoder_position(int encoder_position) {
             INTERFACE.pitch_selection_current_tuning.note_ids[
                 INTERFACE.pitch_selection_current_string_id
             ] -= 1;
+        }
+        interface_setupDiodeTickDelays(INTERFACE.pitch_selection_current_tuning);
+    } else if (INTERFACE.interface_mode == BRIGHTNESS_SELECTION) {
+        if (encoder_position > INTERFACE.previous_encoder_position) {
+            INTERFACE.brightness_divisor += 1;
+            if (INTERFACE.brightness_divisor > BRIGHTNESS_DIVISOR_MAX)
+                INTERFACE.brightness_divisor = BRIGHTNESS_DIVISOR_MAX;
+        } else {
+            INTERFACE.brightness_divisor -= 1;
+            if (INTERFACE.brightness_divisor < BRIGHTNESS_DIVISOR_MIN)
+                INTERFACE.brightness_divisor = BRIGHTNESS_DIVISOR_MIN;
         }
         interface_setupDiodeTickDelays(INTERFACE.pitch_selection_current_tuning);
     } else {

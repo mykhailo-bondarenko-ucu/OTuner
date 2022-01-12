@@ -10,11 +10,14 @@
 #include <supmath.h>
 
 #define TICK_FREQ_D 64000000.
-#define LIGHT_FRACTION_DIVISOR 10
+#define BRIGHTNESS_FRACTION_INITIAL_DIVISOR 10
+#define BRIGHTNESS_DIVISOR_MIN 3
+#define BRIGHTNESS_DIVISOR_MAX 50
 
 typedef enum {
     PITCH_SELECTION,
-    TUNING_PRESETS_SELECTION
+    TUNING_PRESETS_SELECTION,
+    BRIGHTNESS_SELECTION
 } INTERFACE_MODE_t;
 
 typedef struct {
@@ -23,6 +26,7 @@ typedef struct {
     Tuning pitch_selection_current_tuning;
     uint8_t pitch_selection_current_string_id;
     uint8_t presets_selection_current_tuning_id;
+    uint8_t brightness_divisor;
     int previous_encoder_position;
 } INTERFACE_t;
 
