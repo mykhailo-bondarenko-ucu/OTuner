@@ -50,6 +50,7 @@ typedef enum {
 INTERFACE_RESPONSE interface_init(I2C_HandleTypeDef *hi2c);
 INTERFACE_RESPONSE interface_update();
 INTERFACE_RESPONSE interface_toggle_mode();
+INTERFACE_RESPONSE interface_register_long_press();
 INTERFACE_RESPONSE interface_register_single_press();
 INTERFACE_RESPONSE interface_register_encoder_position(int encoder_position);
 

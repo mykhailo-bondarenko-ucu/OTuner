@@ -104,6 +104,17 @@ INTERFACE_RESPONSE interface_register_single_press() {
     return interface_update();
 }
 
+INTERFACE_RESPONSE interface_register_long_press() {
+    if (INTERFACE.interface_mode == PITCH_SELECTION) {
+        INTERFACE.interface_mode = BRIGHTNESS_SELECTION;
+    } else if (INTERFACE.interface_mode == BRIGHTNESS_SELECTION) {
+        INTERFACE.interface_mode = PITCH_SELECTION;
+    } else {
+        // TODO: preset selection mode
+    }
+    return interface_update();
+}
+
 INTERFACE_RESPONSE interface_register_encoder_position(int encoder_position) {
     if (INTERFACE.interface_mode == PITCH_SELECTION) {
         if (encoder_position > INTERFACE.previous_encoder_position) {
