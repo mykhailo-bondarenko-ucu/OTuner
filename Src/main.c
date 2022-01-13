@@ -134,7 +134,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     if (HAL_GetTick() - enc_clk_last_it_tick < 150 && DT != encoder.last_DT) return;
 
     enc_clk_last_it_tick = HAL_GetTick();
-    encoder.position += (DT == GPIO_PIN_RESET) ? 1 : -1;
+    encoder.position += (DT == GPIO_PIN_RESET) ? -1 : 1;
     encoder.position_was_changed = 1;
     encoder.last_DT = DT;
   }
