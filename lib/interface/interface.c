@@ -121,10 +121,16 @@ INTERFACE_RESPONSE interface_register_long_press() {
 INTERFACE_RESPONSE interface_register_encoder_position(int encoder_position) {
     if (INTERFACE.interface_mode == PITCH_SELECTION) {
         if (encoder_position > INTERFACE.previous_encoder_position) {
+            if (INTERFACE.pitch_selection_current_tuning.note_ids[
+                INTERFACE.pitch_selection_current_string_id
+            ] >= (NOTES_NUM - 1)) return INTERFACE_OK;
             INTERFACE.pitch_selection_current_tuning.note_ids[
                 INTERFACE.pitch_selection_current_string_id
             ] += 1;
         } else {
+            if (INTERFACE.pitch_selection_current_tuning.note_ids[
+                INTERFACE.pitch_selection_current_string_id
+            ] <= 0) return INTERFACE_OK;
             INTERFACE.pitch_selection_current_tuning.note_ids[
                 INTERFACE.pitch_selection_current_string_id
             ] -= 1;

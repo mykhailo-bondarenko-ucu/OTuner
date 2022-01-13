@@ -130,7 +130,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
     GPIO_PinState DT = HAL_GPIO_ReadPin(ENC_DT_GPIO_Port, ENC_DT_Pin);
 
-    if (HAL_GetTick() - enc_clk_last_it_tick < 50) return;
+    if (HAL_GetTick() - enc_clk_last_it_tick < 250) return;
     if (HAL_GetTick() - enc_clk_last_it_tick < 150 && DT != encoder.last_DT) return;
 
     enc_clk_last_it_tick = HAL_GetTick();
