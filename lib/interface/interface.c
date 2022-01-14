@@ -82,15 +82,12 @@ INTERFACE_RESPONSE interface_update() {
         sprintf(buff, "Brightness: %d%%", INTERFACE.brightness_percent);
         ssd1306_WriteString(buff, Font_7x10, White);
     } else if (INTERFACE.interface_mode == TUNING_PRESETS_SELECTION){
-        ssd1306_SetCursor(11, 0);
-        sprintf(buff, "Pitch selection");
-        ssd1306_WriteString(buff, Font_7x10, White);
         ssd1306_SetCursor(8, 0);
         sprintf(buff, "Preset selection");
         ssd1306_WriteString(buff, Font_7x10, White);
-        ssd1306_SetCursor(0, 16);
+        ssd1306_SetCursor(5, 16);
         sprintf(buff, TUNINGS[INTERFACE.presets_selection_current_tuning_id].name);
-        ssd1306_WriteString(buff, Font_7x10, White);
+        ssd1306_WriteString(buff, Font_11x18, White);
     }
     // Copy all data from local screenbuffer to the screen
     if (ssd1306_UpdateScreen(INTERFACE.hi2c) == HAL_OK) {
