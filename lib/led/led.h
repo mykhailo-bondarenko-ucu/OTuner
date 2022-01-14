@@ -1,7 +1,9 @@
 #ifndef _LED_H
 #define _LED_H
 
+#include "timer_delay.h"
 #include "interface.h"
+#include "gpio.h"
 
 typedef enum {
     LED_OK,
@@ -9,6 +11,6 @@ typedef enum {
 } LED_RESPONSE;
 
 LED_RESPONSE led_init();
-void led_update(INTERFACE_PUBLIC_t* INPERFACE_P);
+LED_RESPONSE led_perform_update_cycle(INTERFACE_PUBLIC_t INPERFACE_P);
 
 #endif

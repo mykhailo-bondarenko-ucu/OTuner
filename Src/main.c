@@ -26,17 +26,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#include "timer_delay.h"
 #include "interface.h"
 #include "encoder.h"
-#include "tunings.h"
-#include "supmath.h"
 #include "ssd1306.h"
-#include "string.h"
-#include "stdio.h"
-#include "fonts.h"
-#include "notes.h"
-#include "math.h"
+#include "led.h"
 
 /* USER CODE END Includes */
 
@@ -124,15 +117,9 @@ int main(void)
 
   // === setup all pins
 
-  HAL_Delay(10);  // blink C13 for restart confirmation
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
   // reset diodes
-  HAL_GPIO_WritePin(S1_GPIO_Port, S1_Pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(S2_GPIO_Port, S2_Pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(S3_GPIO_Port, S3_Pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(S4_GPIO_Port, S4_Pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(S5_GPIO_Port, S5_Pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(S6_GPIO_Port, S6_Pin, GPIO_PIN_RESET);
+  led_init();
 
   /* USER CODE END 2 */
 
@@ -155,12 +142,7 @@ int main(void)
       interface_register_single_press();
     }
 
-    // TODO: diode interface
-    HAL_GPIO_WritePin(GPIOA, INTERFACE_P.pitch_selection_lighted_diode_pin, GPIO_PIN_SET);
-    // TODO: timer interface (?)
-    tim32_32BitDelay(INTERFACE_P.diode_delay_ticks[INTERFACE_P.pitch_selection_current_string_id].light_ticks);
-    HAL_GPIO_WritePin(GPIOA, INTERFACE_P.pitch_selection_lighted_diode_pin, GPIO_PIN_RESET);
-    tim32_32BitDelay(INTERFACE_P.diode_delay_ticks[INTERFACE_P.pitch_selection_current_string_id].pause_ticks);
+    led_perform_update_cycle(INTERFACE_P);
 
     /* USER CODE END WHILE */
 

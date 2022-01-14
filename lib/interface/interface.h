@@ -37,7 +37,6 @@ typedef struct {
 
 typedef struct {
     INTERFACE_DIODE_DELAY_TICKS_t diode_delay_ticks[STRINGS_NUM];
-    // TODO: pass info directly to diode interface
     uint8_t pitch_selection_current_string_id;
     uint16_t pitch_selection_lighted_diode_pin;
 } INTERFACE_PUBLIC_t;
