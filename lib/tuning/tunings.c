@@ -8,5 +8,6 @@ Tuning tuning_copy(Tuning of) {
 }
 
 Tuning TUNINGS[TUNINGS_NUM] = {
-    { {28, 33, 38, 43, 47, 52}, "Std. E4" }
+    { {28, 33, 38, 43, 47, 52}, "Std. E4" },
+    { {26, 33, 38, 43, 47, 52}, "Drop D" }
 };

@@ -98,6 +98,7 @@ INTERFACE_RESPONSE interface_register_single_press() {
         INTERFACE.presets_selection_current_tuning_id += 1;
         INTERFACE.presets_selection_current_tuning_id %= TUNINGS_NUM;
         INTERFACE.pitch_selection_current_tuning = tuning_copy(TUNINGS[INTERFACE.presets_selection_current_tuning_id]);
+        interface_setupDiodeTickDelays(INTERFACE.pitch_selection_current_tuning);
     }
     return interface_update();
 }

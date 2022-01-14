@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define TUNINGS_NUM 1
+#define TUNINGS_NUM 2
 #define STRINGS_NUM 6
 #define TUNING_MAX_NAME_LENGTH 10
 
