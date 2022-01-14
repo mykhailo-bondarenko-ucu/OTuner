@@ -64,7 +64,7 @@ typedef struct {
   GPIO_PinState last_DT;
 } Encoder;
 
-volatile Encoder encoder = {0, 0, 0, 0, 0};
+volatile Encoder encoder = {0, 0, 0, 0, 0, 0};
 
 /* USER CODE END PV */
 
@@ -79,32 +79,21 @@ void SystemClock_Config(void);
 
 // === Functions for delay timer
 
-volatile uint8_t tim2UpdateInterruptFlag = 0;
-void tim2_32BitDelay(uint32_t delay_ticks) {
-  uint16_t tim2_st = __HAL_TIM_GET_COUNTER(&htim2);
-  uint16_t ticksUntilInterr = 0xFFFF - tim2_st;
-
-  if (delay_ticks < ((uint32_t) ticksUntilInterr)) {
-    while (((uint16_t) (__HAL_TIM_GET_COUNTER(&htim2) - tim2_st)) < delay_ticks) {}
-    return;
+uint32_t tim32_getTicks() {
+  uint32_t tim3_cnt = __HAL_TIM_GET_COUNTER(&htim3);
+  uint32_t tim2_cnt = __HAL_TIM_GET_COUNTER(&htim2);
+  if (__HAL_TIM_GET_COUNTER(&htim3) > tim3_cnt) {
+    // get counters again in case of overflow of tim2
+    tim3_cnt = __HAL_TIM_GET_COUNTER(&htim3);
+    tim2_cnt = __HAL_TIM_GET_COUNTER(&htim2);
   }
-
-  delay_ticks -= ticksUntilInterr;
-  tim2UpdateInterruptFlag = 0;
-  while (!tim2UpdateInterruptFlag) {}
-
-  while (delay_ticks > 0xFFFF) {
-    delay_ticks -= 0xFFFF;
-    tim2UpdateInterruptFlag = 0;
-    while (!tim2UpdateInterruptFlag) {}
-  }
-
-  while (((uint16_t) __HAL_TIM_GET_COUNTER(&htim2)) < delay_ticks) {}
+  return (((uint32_t) tim3_cnt) << 16) + tim2_cnt;
 }
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-  if (htim->Instance == TIM2) {
-    tim2UpdateInterruptFlag = 1;
+void tim32_32BitDelay(uint32_t delay_ticks) {
+  uint32_t end_ticks = tim32_getTicks() + delay_ticks;
+  while (tim32_getTicks() < end_ticks) {
+    __asm volatile ("nop");
   }
 }
 
@@ -116,7 +105,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     if (HAL_GetTick() - enc_btn_last_it_tick < 50) return;
 
     if (encoder.btn_is_pressed && (
-      HAL_GetTick() - enc_btn_last_it_tick > 320
+      HAL_GetTick() - enc_btn_last_it_tick > 500
     )) encoder.btn_was_pressed_long = 1;
 
     enc_btn_last_it_tick = HAL_GetTick();
@@ -131,7 +120,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     GPIO_PinState DT = HAL_GPIO_ReadPin(ENC_DT_GPIO_Port, ENC_DT_Pin);
 
     if (HAL_GetTick() - enc_clk_last_it_tick < 250) return;
-    if (HAL_GetTick() - enc_clk_last_it_tick < 150 && DT != encoder.last_DT) return;
+    if (HAL_GetTick() - enc_clk_last_it_tick < 400 && DT != encoder.last_DT) return;
 
     enc_clk_last_it_tick = HAL_GetTick();
     encoder.position += (DT == GPIO_PIN_RESET) ? -1 : 1;
@@ -172,11 +161,13 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM2_Init();
   MX_I2C1_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
   // === setup timers
 
-  HAL_TIM_Base_Start_IT(&htim2);
+  HAL_TIM_Base_Start(&htim2);
+  HAL_TIM_Base_Start(&htim3);
 
   // === setup all pins
 
@@ -218,9 +209,9 @@ int main(void)
     // TODO: diode interface
     HAL_GPIO_WritePin(GPIOA, INTERFACE_P.pitch_selection_lighted_diode_pin, GPIO_PIN_SET);
     // TODO: timer interface (?)
-    tim2_32BitDelay(INTERFACE_P.diode_delay_ticks[INTERFACE_P.pitch_selection_current_string_id].light_ticks);
+    tim32_32BitDelay(INTERFACE_P.diode_delay_ticks[INTERFACE_P.pitch_selection_current_string_id].light_ticks);
     HAL_GPIO_WritePin(GPIOA, INTERFACE_P.pitch_selection_lighted_diode_pin, GPIO_PIN_RESET);
-    tim2_32BitDelay(INTERFACE_P.diode_delay_ticks[INTERFACE_P.pitch_selection_current_string_id].pause_ticks);
+    tim32_32BitDelay(INTERFACE_P.diode_delay_ticks[INTERFACE_P.pitch_selection_current_string_id].pause_ticks);
 
     /* USER CODE END WHILE */
 
