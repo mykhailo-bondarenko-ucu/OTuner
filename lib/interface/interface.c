@@ -74,6 +74,9 @@ INTERFACE_RESPONSE interface_update() {
         ssd1306_WriteString(buff, Font_7x10, White);
     } else if (INTERFACE.interface_mode == TUNING_PRESETS_SELECTION){
         ssd1306_Fill(Black);
+        ssd1306_SetCursor(8, 0);
+        sprintf(buff, "Preset selection");
+        ssd1306_WriteString(buff, Font_7x10, White);
         ssd1306_SetCursor(0, 16);
         sprintf(buff, TUNINGS[INTERFACE.presets_selection_current_tuning_id].name);
         ssd1306_WriteString(buff, Font_7x10, White);
