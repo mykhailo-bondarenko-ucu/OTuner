@@ -118,8 +118,7 @@ int main(void)
   // === setup all pins
 
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
-  // reset diodes
-  led_init();
+  led_init(); // reset diodes
 
   /* USER CODE END 2 */
 
