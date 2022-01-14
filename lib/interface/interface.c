@@ -79,9 +79,9 @@ INTERFACE_RESPONSE interface_update() {
         sprintf(buff, "Brightness");
         ssd1306_WriteString(buff, Font_7x10, White);
         ssd1306_SetCursor(13, 31);
-        ssd1306_DrawSquare(12, 102, White);
+        ssd1306_DrawSquare(102, 12, White);
         ssd1306_MoveCursor(1, 1);
-        ssd1306_FillSquare(5, INTERFACE.brightness_percent, White);
+        ssd1306_FillSquare(INTERFACE.brightness_percent, 5, White);
         ssd1306_MoveCursor(0, 6);
         sprintf(buff, "Brightness: %d%%", INTERFACE.brightness_percent);
         ssd1306_WriteString(buff, Font_7x10, White);
