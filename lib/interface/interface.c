@@ -97,6 +97,7 @@ INTERFACE_RESPONSE interface_register_single_press() {
     } else {
         INTERFACE.presets_selection_current_tuning_id += 1;
         INTERFACE.presets_selection_current_tuning_id %= TUNINGS_NUM;
+        INTERFACE.pitch_selection_current_tuning = tuning_copy(TUNINGS[INTERFACE.presets_selection_current_tuning_id]);
     }
     return interface_update();
 }
@@ -130,7 +131,6 @@ INTERFACE_RESPONSE interface_register_encoder_position(int encoder_position) {
                 INTERFACE.pitch_selection_current_string_id
             ] -= 1;
         }
-        interface_setupDiodeTickDelays(INTERFACE.pitch_selection_current_tuning);
     } else if (INTERFACE.interface_mode == BRIGHTNESS_SELECTION) {
         if (encoder_position > INTERFACE.previous_encoder_position) {
             INTERFACE.brightness_divisor += 1;
@@ -141,7 +141,6 @@ INTERFACE_RESPONSE interface_register_encoder_position(int encoder_position) {
             if (INTERFACE.brightness_divisor < BRIGHTNESS_DIVISOR_MIN)
                 INTERFACE.brightness_divisor = BRIGHTNESS_DIVISOR_MIN;
         }
-        interface_setupDiodeTickDelays(INTERFACE.pitch_selection_current_tuning);
     } else if (INTERFACE.interface_mode == TUNING_PRESETS_SELECTION) {
         if (encoder_position > INTERFACE.previous_encoder_position) {
             if (INTERFACE.presets_selection_current_tuning_id >= (TUNINGS_NUM - 1)) {
@@ -159,6 +158,7 @@ INTERFACE_RESPONSE interface_register_encoder_position(int encoder_position) {
 
         INTERFACE.pitch_selection_current_tuning = tuning_copy(TUNINGS[INTERFACE.presets_selection_current_tuning_id]);
     }
+    interface_setupDiodeTickDelays(INTERFACE.pitch_selection_current_tuning);
     INTERFACE.previous_encoder_position = encoder_position;
     return interface_update();
 }
