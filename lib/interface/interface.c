@@ -72,8 +72,11 @@ INTERFACE_RESPONSE interface_update() {
         ssd1306_SetCursor(0, 16);
         sprintf(buff, "Brightness: 1/%d", INTERFACE.brightness_divisor);
         ssd1306_WriteString(buff, Font_7x10, White);
-    } else {
-        // TODO: other interface mode
+    } else if (INTERFACE.interface_mode == TUNING_PRESETS_SELECTION){
+        ssd1306_Fill(Black);
+        ssd1306_SetCursor(0, 16);
+        sprintf(buff, TUNINGS[INTERFACE.presets_selection_current_tuning_id].name);
+        ssd1306_WriteString(buff, Font_7x10, White);
     }
     // Copy all data from local screenbuffer to the screen
     if (ssd1306_UpdateScreen(INTERFACE.hi2c) == HAL_OK) {
@@ -81,15 +84,6 @@ INTERFACE_RESPONSE interface_update() {
     } else {
         return INTERFACE_ERROR;
     }
-}
-
-INTERFACE_RESPONSE interface_toggle_mode() {
-    if (INTERFACE.interface_mode == PITCH_SELECTION) {
-        INTERFACE.interface_mode = TUNING_PRESETS_SELECTION;
-    } else {
-        INTERFACE.interface_mode = PITCH_SELECTION;
-    }
-    return INTERFACE_OK;
 }
 
 INTERFACE_RESPONSE interface_register_single_press() {
@@ -111,10 +105,11 @@ INTERFACE_RESPONSE interface_register_long_press() {
     if (INTERFACE.interface_mode == PITCH_SELECTION) {
         INTERFACE.interface_mode = BRIGHTNESS_SELECTION;
     } else if (INTERFACE.interface_mode == BRIGHTNESS_SELECTION) {
+        INTERFACE.interface_mode = TUNING_PRESETS_SELECTION;
+    } else if (INTERFACE.interface_mode == TUNING_PRESETS_SELECTION) {
         INTERFACE.interface_mode = PITCH_SELECTION;
-    } else {
-        // TODO: preset selection mode
     }
+
     return interface_update();
 }
 
@@ -147,8 +142,22 @@ INTERFACE_RESPONSE interface_register_encoder_position(int encoder_position) {
                 INTERFACE.brightness_divisor = BRIGHTNESS_DIVISOR_MIN;
         }
         interface_setupDiodeTickDelays(INTERFACE.pitch_selection_current_tuning);
-    } else {
-        // TODO: other interface mode
+    } else if (INTERFACE.interface_mode == TUNING_PRESETS_SELECTION) {
+        if (encoder_position > INTERFACE.previous_encoder_position) {
+            if (INTERFACE.presets_selection_current_tuning_id >= (TUNINGS_NUM - 1)) {
+                INTERFACE.presets_selection_current_tuning_id = 0;
+            } else {
+                INTERFACE.presets_selection_current_tuning_id += 1;
+            }
+        } else {
+            if (INTERFACE.presets_selection_current_tuning_id <= 0) {
+                INTERFACE.presets_selection_current_tuning_id = TUNINGS_NUM-1;
+            } else {
+                INTERFACE.presets_selection_current_tuning_id -= 1;
+            }
+        }
+
+        INTERFACE.pitch_selection_current_tuning = tuning_copy(TUNINGS[INTERFACE.presets_selection_current_tuning_id]);
     }
     INTERFACE.previous_encoder_position = encoder_position;
     return interface_update();
