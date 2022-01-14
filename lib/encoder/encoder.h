@@ -15,9 +15,9 @@ typedef enum {
     ENCODER_ERROR,
 } ENCODER_RESPONSE;
 
-ENCODER_RESPONSE encoder_single_press();
-ENCODER_RESPONSE encoder_long_press();
-ENCODER_RESPONSE encoder_position_change();
+ENCODER_RESPONSE encoder_use_single_press();
+ENCODER_RESPONSE encoder_use_long_press();
+ENCODER_RESPONSE encoder_use_position_change();
 
 ENCODER_RESPONSE encoder_handle_button_interrupt();
 ENCODER_RESPONSE encoder_handle_clk_interrupt();

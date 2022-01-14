@@ -162,15 +162,15 @@ int main(void)
 
   while (1)
   {
-    if (encoder_position_change() == ENCODER_OK) {
+    if (encoder_use_position_change() == ENCODER_OK) {
       interface_register_encoder_position(encoder.position);
     }
 
-    if (encoder_long_press() == ENCODER_OK) {
+    if (encoder_use_long_press() == ENCODER_OK) {
       interface_register_long_press();
     }
 
-    if (encoder_single_press() == ENCODER_OK) {
+    if (encoder_use_single_press() == ENCODER_OK) {
       interface_register_single_press();
     }
 

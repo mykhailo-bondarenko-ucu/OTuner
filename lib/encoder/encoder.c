@@ -34,7 +34,7 @@ ENCODER_RESPONSE encoder_handle_button_interrupt() {
     return ENCODER_OK;
 }
 
-ENCODER_RESPONSE encoder_long_press() {
+ENCODER_RESPONSE encoder_use_long_press() {
     if (encoder.btn_was_pressed_long) {
       encoder.btn_was_pressed_long = 0;
       encoder.btn_was_pressed = 0;
@@ -44,7 +44,7 @@ ENCODER_RESPONSE encoder_long_press() {
     return ENCODER_ERROR;
 }
 
-ENCODER_RESPONSE encoder_position_change() {
+ENCODER_RESPONSE encoder_use_position_change() {
     if (encoder.position_was_changed) {
         encoder.position_was_changed = 0;
         return ENCODER_OK;
@@ -53,7 +53,7 @@ ENCODER_RESPONSE encoder_position_change() {
     return ENCODER_ERROR;
 }
 
-ENCODER_RESPONSE encoder_single_press() {
+ENCODER_RESPONSE encoder_use_single_press() {
     if (encoder.btn_was_pressed) {
         encoder.btn_was_pressed = 0;
         return ENCODER_OK;
