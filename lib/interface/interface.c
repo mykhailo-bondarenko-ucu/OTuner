@@ -38,10 +38,10 @@ void interface_set_brightness_divisor_from_percent() {
 INTERFACE_RESPONSE interface_init(I2C_HandleTypeDef *hi2c) {
     ssd1306_Init(hi2c);
     INTERFACE.hi2c = hi2c;
+    INTERFACE.tuning_altered_by_user_flag = 0;
     INTERFACE.previous_encoder_position = 0;
     INTERFACE.brightness_percent = BRIGHTNESS_INITIAL_PERCENT;
     interface_set_brightness_divisor_from_percent();
-    // TODO: initialise from saved copy
     INTERFACE.interface_mode = PITCH_SELECTION;
     interface_set_pitch_selection_current_string_id(0);
     INTERFACE.pitch_selection_current_string_id = 0;
@@ -54,7 +54,6 @@ INTERFACE_RESPONSE interface_init(I2C_HandleTypeDef *hi2c) {
 INTERFACE_RESPONSE interface_update() {
     ssd1306_Fill(Black);
     if (INTERFACE.interface_mode == PITCH_SELECTION) {
-        // TODO: optimize drawing logic & time
         Note note = NOTES[INTERFACE.pitch_selection_current_tuning.note_ids[
             INTERFACE.pitch_selection_current_string_id
         ]];
@@ -70,7 +69,6 @@ INTERFACE_RESPONSE interface_update() {
         ssd1306_MoveCursor(1, 2);
         sprintf(buff, STRING_NUM_NAME_FORMAT, STRINGS_NUM - INTERFACE.pitch_selection_current_string_id);
         ssd1306_WriteString(buff, Font_7x10, Black);
-        ssd1306_SetCursor(84, 24);
         ssd1306_SetCursor(5, 46);
         sprintf(buff, "F: %d.%d Hz", ((int) note.freq), ((int) (note.freq * 100.f)) % 100);
         ssd1306_WriteString(buff, Font_7x10, White);
@@ -86,8 +84,24 @@ INTERFACE_RESPONSE interface_update() {
         sprintf(buff, "Preset selection");
         ssd1306_WriteString(buff, Font_7x10, White);
         ssd1306_SetCursor(5, 16);
-        sprintf(buff, TUNINGS[INTERFACE.presets_selection_current_tuning_id].name);
+        if (INTERFACE.tuning_altered_by_user_flag) {
+            INTERFACE.tuning_altered_by_user_flag = 0;
+            sprintf(buff, "Custom");
+        } else {
+            sprintf(buff, TUNINGS[INTERFACE.presets_selection_current_tuning_id].name);
+        }
         ssd1306_WriteString(buff, Font_11x18, White);
+        ssd1306_SetCursor(5, 46);
+        int d = 0;
+        for (uint8_t i = 0; i != STRINGS_NUM; ++i) {
+            d += sprintf(
+                buff + d, "%s",
+                NOTES[INTERFACE.pitch_selection_current_tuning.note_ids[i]].name
+            );
+            buff[d - 1] = ' ';
+            if (buff[d - 2] != '#') { buff[d] = ' '; ++d; }
+        }
+        ssd1306_WriteString(buff, Font_7x10, White);
     }
     // Copy all data from local screenbuffer to the screen
     if (ssd1306_UpdateScreen(INTERFACE.hi2c) == HAL_OK) {
@@ -142,6 +156,7 @@ INTERFACE_RESPONSE interface_register_encoder_position(int encoder_position) {
                 INTERFACE.pitch_selection_current_string_id
             ] -= 1;
         }
+        INTERFACE.tuning_altered_by_user_flag = 1;
     } else if (INTERFACE.interface_mode == BRIGHTNESS_SELECTION) {
         if (encoder_position > INTERFACE.previous_encoder_position) {
             if (INTERFACE.brightness_percent >= 100) INTERFACE.brightness_percent = 100;

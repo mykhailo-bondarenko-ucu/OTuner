@@ -26,6 +26,7 @@ typedef struct {
     I2C_HandleTypeDef *hi2c;
     INTERFACE_MODE_t interface_mode;
     Tuning pitch_selection_current_tuning;
+    uint8_t tuning_altered_by_user_flag;
     uint8_t pitch_selection_current_string_id;
     uint8_t presets_selection_current_tuning_id;
     uint8_t brightness_divisor;
