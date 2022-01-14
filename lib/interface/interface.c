@@ -80,11 +80,11 @@ INTERFACE_RESPONSE interface_update() {
         ssd1306_DrawSquare(102, 12, White);
         ssd1306_MoveCursor(1, 1);
         ssd1306_FillSquare(INTERFACE.brightness_percent, 10, White);
-    } else if (INTERFACE.interface_mode == TUNING_PRESETS_SELECTION){
+    } else if (INTERFACE.interface_mode == TUNING_PRESETS_SELECTION) {
         ssd1306_SetCursor(8, 0);
         sprintf(buff, "Preset selection");
         ssd1306_WriteString(buff, Font_7x10, White);
-        ssd1306_SetCursor(5, 16);
+        ssd1306_SetCursor(5, 21);
         if (INTERFACE.tuning_altered_by_user_flag) {
             INTERFACE.tuning_altered_by_user_flag = 0;
             sprintf(buff, "Custom");
