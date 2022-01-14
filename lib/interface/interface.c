@@ -81,10 +81,7 @@ INTERFACE_RESPONSE interface_update() {
         ssd1306_SetCursor(13, 31);
         ssd1306_DrawSquare(102, 12, White);
         ssd1306_MoveCursor(1, 1);
-        ssd1306_FillSquare(INTERFACE.brightness_percent, 5, White);
-        ssd1306_MoveCursor(-2, 12);
-        sprintf(buff, "Brightness: %d%%", INTERFACE.brightness_percent);
-        ssd1306_WriteString(buff, Font_7x10, White);
+        ssd1306_FillSquare(INTERFACE.brightness_percent, 10, White);
     } else if (INTERFACE.interface_mode == TUNING_PRESETS_SELECTION){
         ssd1306_SetCursor(8, 0);
         sprintf(buff, "Preset selection");
