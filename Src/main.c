@@ -26,6 +26,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "encoder.h"
 #include "interface.h"
 #include "tunings.h"
 #include "supmath.h"
@@ -57,14 +58,6 @@
 
 /* USER CODE BEGIN PV */
 
-typedef struct {
-  int position;
-  uint8_t position_was_changed;
-  uint8_t btn_is_pressed, btn_was_pressed, btn_was_pressed_long;
-  GPIO_PinState last_DT;
-} Encoder;
-
-volatile Encoder encoder = {0, 0, 0, 0, 0};
 
 /* USER CODE END PV */
 
@@ -112,31 +105,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   if (GPIO_Pin == ENC_BTN_Pin) {
-    static uint32_t enc_btn_last_it_tick;
-    if (HAL_GetTick() - enc_btn_last_it_tick < 50) return;
-
-    if (encoder.btn_is_pressed && (
-      HAL_GetTick() - enc_btn_last_it_tick > 320
-    )) encoder.btn_was_pressed_long = 1;
-
-    enc_btn_last_it_tick = HAL_GetTick();
-
-    encoder.btn_is_pressed = !encoder.btn_is_pressed;
-    if (!encoder.btn_is_pressed) encoder.btn_was_pressed = 1;
+    encoder_handle_button_interrupt();
   }
 
   if (GPIO_Pin == ENC_CLK_Pin) {
-    static uint32_t enc_clk_last_it_tick;
-
-    GPIO_PinState DT = HAL_GPIO_ReadPin(ENC_DT_GPIO_Port, ENC_DT_Pin);
-
-    if (HAL_GetTick() - enc_clk_last_it_tick < 250) return;
-    if (HAL_GetTick() - enc_clk_last_it_tick < 150 && DT != encoder.last_DT) return;
-
-    enc_clk_last_it_tick = HAL_GetTick();
-    encoder.position += (DT == GPIO_PIN_RESET) ? -1 : 1;
-    encoder.position_was_changed = 1;
-    encoder.last_DT = DT;
+    encoder_handle_clk_interrupt();
   }
 }
 
@@ -199,19 +172,15 @@ int main(void)
 
   while (1)
   {
-    if (encoder.position_was_changed) {
-      encoder.position_was_changed = 0;
+    if (encoder_position_change() == ENCODER_OK) {
       interface_register_encoder_position(encoder.position);
     }
 
-    if (encoder.btn_was_pressed_long) {
-      encoder.btn_was_pressed_long = 0;
-      encoder.btn_was_pressed = 0;
+    if (encoder_long_press() == ENCODER_OK) {
       interface_register_long_press();
     }
 
-    if (encoder.btn_was_pressed) {
-      encoder.btn_was_pressed = 0;
+    if (encoder_single_press() == ENCODER_OK) {
       interface_register_single_press();
     }
 
