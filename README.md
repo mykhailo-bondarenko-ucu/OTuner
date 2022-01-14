@@ -21,6 +21,14 @@ Other modes:
 
 - Press or rotate the encoder to change the setting.
 
+## Interface
+
+![Pitch selection](img/pitch_selection.jpg)
+
+![Preset selection](img/preset_selection.jpg)
+
+![Brightness](img/brightness.jpg)
+
 ## Components
 
 * Li-Po 380mAh 3.7V
