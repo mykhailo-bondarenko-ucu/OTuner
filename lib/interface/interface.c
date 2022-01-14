@@ -21,12 +21,12 @@ void interface_setupDiodeTickDelays(Tuning tuning) {
 void interface_set_pitch_selection_current_string_id(uint8_t val) {
     INTERFACE.pitch_selection_current_string_id = val;
     INTERFACE_P.pitch_selection_current_string_id = val;
-    if (val == 0) INTERFACE_P.pitch_selection_lighted_diode_pin = S6_Pin;
-    else if (val == 1) INTERFACE_P.pitch_selection_lighted_diode_pin = S5_Pin;
-    else if (val == 2) INTERFACE_P.pitch_selection_lighted_diode_pin = S4_Pin;
-    else if (val == 3) INTERFACE_P.pitch_selection_lighted_diode_pin = S3_Pin;
-    else if (val == 4) INTERFACE_P.pitch_selection_lighted_diode_pin = S2_Pin;
-    else if (val == 5) INTERFACE_P.pitch_selection_lighted_diode_pin = S1_Pin;
+    if (val == 0) INTERFACE_P.pitch_selection_lighted_diode_pin = S1_Pin;
+    else if (val == 1) INTERFACE_P.pitch_selection_lighted_diode_pin = S2_Pin;
+    else if (val == 2) INTERFACE_P.pitch_selection_lighted_diode_pin = S3_Pin;
+    else if (val == 3) INTERFACE_P.pitch_selection_lighted_diode_pin = S4_Pin;
+    else if (val == 4) INTERFACE_P.pitch_selection_lighted_diode_pin = S5_Pin;
+    else if (val == 5) INTERFACE_P.pitch_selection_lighted_diode_pin = S6_Pin;
 }
 
 INTERFACE_RESPONSE interface_init(I2C_HandleTypeDef *hi2c) {
