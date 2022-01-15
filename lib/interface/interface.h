@@ -9,7 +9,8 @@
 #include <ssd1306.h>
 #include <supmath.h>
 
-#define TICK_FREQ_D 64000000.
+#define TICK_FREQ_MULT 1.008  // tick frequency calibration multiplier
+#define TICK_FREQ_D 64000000. * TICK_FREQ_MULT
 #define BRIGHTNESS_INITIAL_PERCENT 40
 #define BRIGHTNESS_DIVISOR_MIN 3
 #define BRIGHTNESS_REAL_PERCENT_MAX 1./((double) BRIGHTNESS_DIVISOR_MIN)
